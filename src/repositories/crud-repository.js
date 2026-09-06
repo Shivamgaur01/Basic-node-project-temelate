@@ -1,4 +1,6 @@
+const { StatusCodes } = require("http-status-codes");
 const { Logger } = require("../config");
+const AppError = require("../utils/errors/app-error");
 
 class CrudRepository {
     constructor(model) {
@@ -12,59 +14,40 @@ class CrudRepository {
 
 
     async destroy(data) {
-        try {
-            const response = await this.model.destroy({
-                where: {
-                    id: data
-                }
-            });
-            return response;
-        }
-        catch (error) {
-            Logger.error('something went wrong in the Crud repo: destroy');
-            throw error;
-        }
+        const response = await this.model.destroy({
+            where: {
+                id: data
+            }
+        });
+        return response;
     }
 
 
     async get(data) {
-        try {
-            const response = await this.model.findByPk(data);
-            return response;
+
+        const response = await this.model.findByPk(data);
+        if(!response){
+            throw new AppError("Not able to find the resource", StatusCodes.NOT_FOUND)
         }
-        catch (error) {
-            Logger.error('something went wrong in the Crud repo: get');
-            throw error;
-        }
+        return response;
     }
 
 
-    async getAll(data) {
-        try {
-            const response = await this.model.findAll(data);
-            return response;
-        }
-        catch (error) {
-            Logger.error('something went wrong in the Crud repo: getAll');
-            throw error;
-        }
+    async getAll() {
+        const response = await this.model.findAll();
+        return response;
+
     }
 
 
     async update(id, data) {
         //  data should be in object 
-        try {
-            const response = await this.model.update(data, {
-                where: {
-                    id: id
-                }
-            });
-            return response;
-        }
-        catch (error) {
-            Logger.error('something went wrong in the Crud repo: getAll');
-            throw error;
-        }
+        const response = await this.model.update(data, {
+            where: {
+                id: id
+            }
+        });
+        return response;
     }
 }
 
