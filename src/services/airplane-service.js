@@ -57,9 +57,28 @@ async function destroyAirplane(id) {
     }
 }
 
+async function updateAirplane(id, data) {
+    try {
+        const response = await airplaneRepository.update(id, data);
+        return response;
+    }
+    catch (error) {
+         console.log("SERVICE ERROR:", error);
+    console.log("STATUS CODE:", error.statusCode);
+        if (error.statusCode == StatusCodes.NOT_FOUND) {
+            throw new AppError('The airplane you requested is not present', error.statusCode)
+        }
+        else if(error.statusCode == StatusCodes.BAD_REQUEST){
+            throw new AppError('There is not data to modify', error.statusCode)
+        }
+        throw new AppError('Cannot fetch data of all aeroplanes', StatusCodes.INTERNAL_SERVER_ERROR)
+    }
+}
+
 module.exports = {
     createAirplane,
     getAirplanes,
     getAirplane,
-    destroyAirplane
+    destroyAirplane,
+    updateAirplane
 }

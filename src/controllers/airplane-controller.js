@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { AirplaneService } = require("../services");
 const { SuccessResponse, ErrorResponse } = require("../utils/common");
+const AppError = require("../utils/errors/app-error");
 
 async function createAirplane(req, res) {
     try {
@@ -67,9 +68,28 @@ async function destroyAirplane(req, res) {
     }
 }
 
+async function updateAirplane(req, res) {
+    try {
+        if(!req.body){
+            throw new AppError("Data is empty", StatusCodes.BAD_REQUEST)
+        }
+        const airplanes = await AirplaneService.updateAirplane(req.params.id, req.body);
+        SuccessResponse.data = airplanes;
+        return res
+            .status(StatusCodes.OK)
+            .json(SuccessResponse);
+    } catch (error) {
+        ErrorResponse.error = error
+        return res
+            .status(error.statusCode)
+            .json(ErrorResponse);
+    }
+}
+
 module.exports = {
     createAirplane,
     getAirplanes,
     getAirplane,
-    destroyAirplane
+    destroyAirplane,
+    updateAirplane
 }
